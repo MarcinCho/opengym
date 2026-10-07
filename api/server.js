@@ -223,6 +223,10 @@ function json(res, code, obj, extraHeaders) {
 }
 function readBody(req) {
   return new Promise((resolve, reject) => {
+    // JSON only: a cross-site <form> can't send application/json, so this closes the
+    // text/plain form-post route around SameSite=Lax. The frontend always sends it.
+    if (!/^application\/json\b/i.test(req.headers['content-type'] || ''))
+      return reject(Object.assign(new Error('content-type must be application/json'), { status: 415 }));
     let size = 0; const chunks = [];
     req.on('data', d => {
       size += d.length;
@@ -549,6 +553,6 @@ http.createServer(async (req, res) => {
   try { await handler(req, res); }
   catch (e) {
     console.error(key, e);
-    if (!res.headersSent) json(res, 500, { error: 'server error' });
+    if (!res.headersSent) json(res, e.status || 500, { error: e.status ? e.message : 'server error' });
   }
 }).listen(PORT, () => console.log(`gym-api on :${PORT} (rpID=${RP_ID}, origin=${ORIGIN})`));

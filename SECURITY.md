@@ -116,7 +116,7 @@ Read this before hosting openGym for anyone other than yourself.
   was issued with, so changing the setting doesn't reach cookies that are already out. Deleting
   `./data/secret` and restarting still works as the instance-wide reset, and disabling an account
   still locks out one user completely.
-- **CSRF protection is `SameSite=Lax` and nothing else.** There are no CSRF tokens.
+- **CSRF protection is `SameSite=Lax` plus a JSON-only body rule.** There are no CSRF tokens; every route that reads a body rejects anything but `Content-Type: application/json` with 415, so a cross-site form post can't reach a handler.
 - **User verification is preferred, not required.** Both handshakes pass
   `requireUserVerification: false` (`api/server.js:297`, `api/server.js:343`), so a passkey
   released without a biometric or PIN is still accepted. In practice: unlocked device ≈ account

@@ -1,0 +1,7 @@
+# Runtime data: session secret, VAPID private key, user DB and per-user state. Never commit.
+/data/
+# Exercise media is downloaded by `docker compose up` (see docker-compose.yml)
+/media/
+.env
+.DS_Store
+node_modules/
